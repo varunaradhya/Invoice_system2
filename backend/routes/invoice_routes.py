@@ -119,3 +119,43 @@ def create_invoice():
         raise
     finally:
         db.close()
+
+
+@invoice_bp.route('/<int:invoice_id>', methods=['DELETE'])
+def delete_invoice(invoice_id):
+    db = get_db()
+    try:
+        invoice = db.execute("SELECT * FROM invoices WHERE id = ?", (invoice_id,)).fetchone()
+        if not invoice:
+            return jsonify({"error": "Invoice not found"}), 404
+
+        items = db.execute("SELECT product_id, quantity FROM invoice_items WHERE invoice_id = ?", (invoice_id,)).fetchall()
+        for item in items:
+            db.execute("""
+                UPDATE products
+                SET quantity = quantity + ?
+                WHERE id = ?
+            """, (item["quantity"], item["product_id"]))
+
+        db.execute("DELETE FROM payments WHERE invoice_id = ?", (invoice_id,))
+        db.execute("DELETE FROM invoice_items WHERE invoice_id = ?", (invoice_id,))
+        db.execute("DELETE FROM invoices WHERE id = ?", (invoice_id,))
+        db.execute("""
+            UPDATE customers
+            SET total_amount = MAX(total_amount - ?, 0),
+                advance_paid = MAX(advance_paid - ?, 0),
+                balance = balance - ?
+            WHERE id = ?
+        """, (
+            invoice["final_total"],
+            invoice["amount_paid"],
+            invoice["final_total"] - invoice["amount_paid"],
+            invoice["customer_id"]
+        ))
+        db.commit()
+        return jsonify({"msg": "Invoice deleted and stock/customer ledger reversed"})
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()

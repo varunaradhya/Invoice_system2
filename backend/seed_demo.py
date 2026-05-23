@@ -10,10 +10,10 @@ CUSTOMERS = [
 ]
 
 PRODUCTS = [
-    ("Premium Cotton Roll", 1250.00, 5.0, 80),
-    ("Oak Wall Panel", 3400.00, 18.0, 35),
-    ("Commercial Oven Tray", 780.00, 12.0, 120),
-    ("Packaging Labels", 3.50, 5.0, 2000),
+    ("Premium Cotton Roll", "Textiles", "5208", "MTR", 890.00, 1250.00, 5.0, 80, 10),
+    ("Oak Wall Panel", "Interior", "4418", "PCS", 2500.00, 3400.00, 18.0, 35, 6),
+    ("Commercial Oven Tray", "Bakery", "7323", "PCS", 520.00, 780.00, 12.0, 120, 15),
+    ("Packaging Labels", "Packaging", "4821", "PCS", 1.75, 3.50, 5.0, 2000, 200),
 ]
 
 INVOICES = [
@@ -45,10 +45,14 @@ def seed_demo_data():
         )
         customer_ids.append(cursor.lastrowid)
 
-    for name, price, gst_percent, quantity in PRODUCTS:
+    for name, category, hsn_code, unit, cost_price, price, gst_percent, quantity, low_stock_alert in PRODUCTS:
         cursor = db.execute(
-            "INSERT INTO products (name, price, gst_percent, quantity) VALUES (?, ?, ?, ?)",
-            (name, price, gst_percent, quantity)
+            """
+            INSERT INTO products
+                (name, category, hsn_code, unit, cost_price, price, gst_percent, quantity, low_stock_alert)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (name, category, hsn_code, unit, cost_price, price, gst_percent, quantity, low_stock_alert)
         )
         product_ids.append(cursor.lastrowid)
 

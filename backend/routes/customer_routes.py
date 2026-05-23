@@ -23,3 +23,25 @@ def get_customers():
     rows = db.execute("SELECT * FROM customers").fetchall()
     db.close()
     return jsonify([dict(r) for r in rows])
+
+
+@customer_bp.route('/<int:customer_id>', methods=['DELETE'])
+def delete_customer(customer_id):
+    db = get_db()
+    try:
+        references = db.execute("""
+            SELECT
+                (SELECT COUNT(*) FROM invoices WHERE customer_id = ?) +
+                (SELECT COUNT(*) FROM quotations WHERE customer_id = ?) +
+                (SELECT COUNT(*) FROM payments WHERE customer_id = ?) AS count
+        """, (customer_id, customer_id, customer_id)).fetchone()["count"]
+        if references:
+            return jsonify({"error": "Customer has invoices, quotations, or payments. Keep history or delete those records first."}), 400
+
+        result = db.execute("DELETE FROM customers WHERE id = ?", (customer_id,))
+        if result.rowcount == 0:
+            return jsonify({"error": "Customer not found"}), 404
+        db.commit()
+        return jsonify({"msg": "Customer deleted"})
+    finally:
+        db.close()
