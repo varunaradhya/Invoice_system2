@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ERP System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>ERP</h2>
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('customers')">Customers</button>
+    <button onclick="showPage('products')">Products</button>
+    <button onclick="showPage('invoice')">Create Invoice</button>
+    <button onclick="showPage('payments')">Payments</button>
+</div>
+
+<div class="main">
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="page">
+        <h2>Dashboard</h2>
+        <button onclick="loadStats()">Refresh</button>
+        <div id="stats"></div>
+    </div>
+
+    <!-- Customers -->
+    <div id="customers" class="page hidden">
+        <h2>Customers</h2>
+
+        <input id="c_name" placeholder="Name">
+        <input id="c_phone" placeholder="Phone">
+        <input id="c_gstin" placeholder="GSTIN">
+        <button onclick="addCustomer()">Add</button>
+
+        <table id="customerTable"></table>
+    </div>
+
+    <!-- Products -->
+    <div id="products" class="page hidden">
+        <h2>Products</h2>
+
+        <input id="p_name" placeholder="Name">
+        <input id="p_price" placeholder="Price">
+        <input id="p_gst" placeholder="GST %">
+        <input id="p_qty" placeholder="Quantity">
+        <button onclick="addProduct()">Add</button>
+
+        <table id="productTable"></table>
+    </div>
+
+    <!-- Invoice -->
+    <div id="invoice" class="page hidden">
+        <h2>Create Invoice</h2>
+
+        <select id="invoice_customer"></select>
+
+        <h3>Add Item</h3>
+        <select id="product_select"></select>
+        <input id="qty" placeholder="Qty">
+        <button onclick="addItem()">Add Item</button>
+
+        <ul id="items"></ul>
+
+        <button onclick="createInvoice()">Generate Invoice</button>
+    </div>
+
+    <!-- Payments -->
+    <div id="payments" class="page hidden">
+        <h2>Payments</h2>
+
+        <input id="pay_customer" placeholder="Customer ID">
+        <input id="pay_invoice" placeholder="Invoice ID">
+        <input id="pay_amount" placeholder="Amount">
+        <button onclick="addPayment()">Submit</button>
+    </div>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
