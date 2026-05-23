@@ -9,8 +9,13 @@ def dashboard():
 
     total_sales = db.execute("SELECT SUM(final_total) as t FROM invoices").fetchone()['t']
     pending = db.execute("SELECT SUM(balance) as b FROM customers").fetchone()['b']
+    paid = db.execute("SELECT SUM(amount_paid) as p FROM invoices").fetchone()['p']
+    invoice_count = db.execute("SELECT COUNT(*) as c FROM invoices").fetchone()['c']
+    db.close()
 
     return jsonify({
         "total_sales": total_sales or 0,
-        "pending": pending or 0
+        "pending": pending or 0,
+        "paid": paid or 0,
+        "invoice_count": invoice_count or 0
     })

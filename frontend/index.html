@@ -1,81 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ERP System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Studio</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<div class="sidebar">
-    <h2>ERP</h2>
-    <button onclick="showPage('dashboard')">Dashboard</button>
-    <button onclick="showPage('customers')">Customers</button>
-    <button onclick="showPage('products')">Products</button>
-    <button onclick="showPage('invoice')">Create Invoice</button>
-    <button onclick="showPage('payments')">Payments</button>
-</div>
-
-<div class="main">
-
-    <!-- Dashboard -->
-    <div id="dashboard" class="page">
-        <h2>Dashboard</h2>
-        <button onclick="loadStats()">Refresh</button>
-        <div id="stats"></div>
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-mark">IS</div>
+        <div>
+            <h1>Invoice Studio</h1>
+            <p>Billing workspace</p>
+        </div>
     </div>
 
-    <!-- Customers -->
-    <div id="customers" class="page hidden">
-        <h2>Customers</h2>
+    <nav class="nav">
+        <button class="nav-link active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</button>
+        <button class="nav-link" data-page="customers" onclick="showPage('customers')">Customers</button>
+        <button class="nav-link" data-page="products" onclick="showPage('products')">Products</button>
+        <button class="nav-link" data-page="invoice" onclick="showPage('invoice')">Create Invoice</button>
+        <button class="nav-link" data-page="payments" onclick="showPage('payments')">Payments</button>
+    </nav>
 
-        <input id="c_name" placeholder="Name">
-        <input id="c_phone" placeholder="Phone">
-        <input id="c_gstin" placeholder="GSTIN">
-        <button onclick="addCustomer()">Add</button>
-
-        <table id="customerTable"></table>
+    <div class="sidebar-card">
+        <span>Demo Mode</span>
+        <strong>Need sample records?</strong>
+        <button class="ghost-btn" onclick="seedDemoData()">Load Demo Data</button>
     </div>
+</aside>
 
-    <!-- Products -->
-    <div id="products" class="page hidden">
-        <h2>Products</h2>
+<main class="main">
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Operations</p>
+            <h2 id="pageTitle">Dashboard</h2>
+        </div>
+        <button class="secondary-btn" onclick="refreshCurrentPage()">Refresh</button>
+    </header>
 
-        <input id="p_name" placeholder="Name">
-        <input id="p_price" placeholder="Price">
-        <input id="p_gst" placeholder="GST %">
-        <input id="p_qty" placeholder="Quantity">
-        <button onclick="addProduct()">Add</button>
+    <section id="dashboard" class="page">
+        <div id="stats" class="stats-grid"></div>
+        <div class="workspace-grid">
+            <article class="panel wide">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Open Work</p>
+                        <h3>Recent Invoices</h3>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table id="invoiceTable"></table>
+                </div>
+            </article>
+            <article class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Cashflow</p>
+                        <h3>Collection Health</h3>
+                    </div>
+                </div>
+                <div class="meter">
+                    <div id="paidMeter" class="meter-fill"></div>
+                </div>
+                <p id="collectionSummary" class="muted"></p>
+            </article>
+        </div>
+    </section>
 
-        <table id="productTable"></table>
-    </div>
+    <section id="customers" class="page hidden">
+        <div class="workspace-grid">
+            <article class="panel form-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">New Account</p>
+                        <h3>Add Customer</h3>
+                    </div>
+                </div>
+                <label>Name<input id="c_name" placeholder="Aarav Textiles"></label>
+                <label>Phone<input id="c_phone" placeholder="9876543210"></label>
+                <label>GSTIN<input id="c_gstin" placeholder="29ABCDE1234F1Z5"></label>
+                <button class="primary-btn" onclick="addCustomer()">Add Customer</button>
+            </article>
+            <article class="panel wide">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Ledger</p>
+                        <h3>Customers</h3>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table id="customerTable"></table>
+                </div>
+            </article>
+        </div>
+    </section>
 
-    <!-- Invoice -->
-    <div id="invoice" class="page hidden">
-        <h2>Create Invoice</h2>
+    <section id="products" class="page hidden">
+        <div class="workspace-grid">
+            <article class="panel form-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Inventory</p>
+                        <h3>Add Product</h3>
+                    </div>
+                </div>
+                <label>Name<input id="p_name" placeholder="Premium Cotton Roll"></label>
+                <label>Price<input id="p_price" type="number" min="0" step="0.01" placeholder="1250"></label>
+                <label>GST %<input id="p_gst" type="number" min="0" step="0.01" placeholder="18"></label>
+                <label>Quantity<input id="p_qty" type="number" min="0" step="1" placeholder="80"></label>
+                <button class="primary-btn" onclick="addProduct()">Add Product</button>
+            </article>
+            <article class="panel wide">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Stock</p>
+                        <h3>Products</h3>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table id="productTable"></table>
+                </div>
+            </article>
+        </div>
+    </section>
 
-        <select id="invoice_customer"></select>
+    <section id="invoice" class="page hidden">
+        <div class="workspace-grid">
+            <article class="panel form-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Billing</p>
+                        <h3>Create Invoice</h3>
+                    </div>
+                </div>
+                <label>Customer<select id="invoice_customer"></select></label>
+                <label>Product<select id="product_select"></select></label>
+                <label>Quantity<input id="qty" type="number" min="1" step="1" placeholder="2"></label>
+                <button class="secondary-btn" onclick="addItem()">Add Item</button>
+                <button class="primary-btn" onclick="createInvoice()">Generate Invoice</button>
+                <p id="invoiceMessage" class="message"></p>
+            </article>
+            <article class="panel wide">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Draft</p>
+                        <h3>Invoice Items</h3>
+                    </div>
+                </div>
+                <ul id="items" class="item-list"></ul>
+            </article>
+        </div>
+    </section>
 
-        <h3>Add Item</h3>
-        <select id="product_select"></select>
-        <input id="qty" placeholder="Qty">
-        <button onclick="addItem()">Add Item</button>
+    <section id="payments" class="page hidden">
+        <div class="workspace-grid">
+            <article class="panel form-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Receipts</p>
+                        <h3>Record Payment</h3>
+                    </div>
+                </div>
+                <label>Customer<select id="pay_customer"></select></label>
+                <label>Invoice<select id="pay_invoice"></select></label>
+                <label>Amount<input id="pay_amount" type="number" min="0.01" step="0.01" placeholder="2500"></label>
+                <button class="primary-btn" onclick="addPayment()">Submit Payment</button>
+                <p id="paymentMessage" class="message"></p>
+            </article>
+            <article class="panel wide">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Outstanding</p>
+                        <h3>Unpaid Invoices</h3>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table id="paymentInvoiceTable"></table>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
 
-        <ul id="items"></ul>
-
-        <button onclick="createInvoice()">Generate Invoice</button>
-    </div>
-
-    <!-- Payments -->
-    <div id="payments" class="page hidden">
-        <h2>Payments</h2>
-
-        <input id="pay_customer" placeholder="Customer ID">
-        <input id="pay_invoice" placeholder="Invoice ID">
-        <input id="pay_amount" placeholder="Amount">
-        <button onclick="addPayment()">Submit</button>
-    </div>
-
-</div>
+<div id="toast" class="toast hidden"></div>
 
 <script src="js/app.js"></script>
 </body>
